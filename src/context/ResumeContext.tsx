@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory, Certification, Language, CustomSection, CustomItem, CoverLetter } from '../types/resume';
+import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory, Certification, Language, Reference, Hobby, CustomSection, CustomItem } from '../types/resume';
 import { initialData } from '../utils/initialData';
 
 // Action Types
@@ -31,6 +31,14 @@ type Action =
   | { type: 'UPDATE_LANGUAGE'; payload: { id: string; data: Partial<Language> } }
   | { type: 'DELETE_LANGUAGE'; payload: string }
   | { type: 'REORDER_LANGUAGES'; payload: Language[] }
+  | { type: 'ADD_REFERENCE'; payload: Reference }
+  | { type: 'UPDATE_REFERENCE'; payload: { id: string; data: Partial<Reference> } }
+  | { type: 'DELETE_REFERENCE'; payload: string }
+  | { type: 'REORDER_REFERENCES'; payload: Reference[] }
+  | { type: 'ADD_HOBBY'; payload: Hobby }
+  | { type: 'UPDATE_HOBBY'; payload: { id: string; data: Partial<Hobby> } }
+  | { type: 'DELETE_HOBBY'; payload: string }
+  | { type: 'REORDER_HOBBIES'; payload: Hobby[] }
   | { type: 'ADD_CUSTOM_SECTION'; payload: CustomSection }
   | { type: 'UPDATE_CUSTOM_SECTION'; payload: { id: string; name: string } }
   | { type: 'DELETE_CUSTOM_SECTION'; payload: string }
@@ -38,8 +46,7 @@ type Action =
   | { type: 'UPDATE_CUSTOM_ITEM'; payload: { sectionId: string; itemId: string; data: Partial<CustomItem> } }
   | { type: 'DELETE_CUSTOM_ITEM'; payload: { sectionId: string; itemId: string } }
   | { type: 'REORDER_CUSTOM_ITEMS'; payload: { sectionId: string; items: CustomItem[] } }
-  | { type: 'REORDER_MAIN_SECTIONS'; payload: string[] }
-  | { type: 'UPDATE_COVER_LETTER'; payload: Partial<CoverLetter> };
+  | { type: 'REORDER_MAIN_SECTIONS'; payload: string[] };
 
 const LOCAL_STORAGE_KEY = 'resume-builder-data';
 
@@ -159,6 +166,42 @@ const resumeReducer = (state: ResumeData, action: Action): ResumeData => {
     case 'REORDER_LANGUAGES':
       return { ...state, languages: action.payload };
 
+    // References
+    case 'ADD_REFERENCE':
+      return { ...state, references: [...(state.references || []), action.payload] };
+    case 'UPDATE_REFERENCE':
+      return {
+        ...state,
+        references: (state.references || []).map((ref) =>
+          ref.id === action.payload.id ? { ...ref, ...action.payload.data } : ref
+        ),
+      };
+    case 'DELETE_REFERENCE':
+      return {
+        ...state,
+        references: (state.references || []).filter((ref) => ref.id !== action.payload),
+      };
+    case 'REORDER_REFERENCES':
+      return { ...state, references: action.payload };
+
+    // Hobbies
+    case 'ADD_HOBBY':
+      return { ...state, hobbies: [...(state.hobbies || []), action.payload] };
+    case 'UPDATE_HOBBY':
+      return {
+        ...state,
+        hobbies: (state.hobbies || []).map((hobby) =>
+          hobby.id === action.payload.id ? { ...hobby, ...action.payload.data } : hobby
+        ),
+      };
+    case 'DELETE_HOBBY':
+      return {
+        ...state,
+        hobbies: (state.hobbies || []).filter((hobby) => hobby.id !== action.payload),
+      };
+    case 'REORDER_HOBBIES':
+      return { ...state, hobbies: action.payload };
+
     // Custom Sections
     case 'ADD_CUSTOM_SECTION':
       return {
@@ -219,9 +262,6 @@ const resumeReducer = (state: ResumeData, action: Action): ResumeData => {
     case 'REORDER_MAIN_SECTIONS':
       return { ...state, sectionOrder: action.payload };
 
-    case 'UPDATE_COVER_LETTER':
-      return { ...state, coverLetter: { ...state.coverLetter, ...action.payload } };
-
     default:
       return state;
   }
@@ -247,11 +287,14 @@ const init = (initialState: ResumeData): ResumeData => {
       }
       if (!parsed.certifications) parsed.certifications = [];
       if (!parsed.languages) parsed.languages = [];
+      if (!parsed.references) parsed.references = [];
+      if (!parsed.hobbies) parsed.hobbies = [];
       if (!parsed.customSections) parsed.customSections = [];
-      if (!parsed.coverLetter) parsed.coverLetter = initialData.coverLetter;
       
       if (!parsed.sectionOrder.includes('certifications')) parsed.sectionOrder.push('certifications');
       if (!parsed.sectionOrder.includes('languages')) parsed.sectionOrder.push('languages');
+      if (!parsed.sectionOrder.includes('references')) parsed.sectionOrder.push('references');
+      if (!parsed.sectionOrder.includes('hobbies')) parsed.sectionOrder.push('hobbies');
 
       return parsed;
     }

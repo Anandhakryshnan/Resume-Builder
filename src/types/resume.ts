@@ -64,6 +64,21 @@ export interface Language {
   proficiency: string;
 }
 
+export interface Reference {
+  id: string;
+  name: string;
+  position: string;
+  company: string;
+  contactInfo: string;
+  relationship: string;
+}
+
+export interface Hobby {
+  id: string;
+  name: string;
+  keywords: string;
+}
+
 export interface CustomItem {
   id: string;
   title: string;
@@ -78,15 +93,6 @@ export interface CustomSection {
   items: CustomItem[];
 }
 
-export interface CoverLetter {
-  date: string;
-  recipientName: string;
-  recipientCompany: string;
-  recipientAddress: string;
-  subject: string;
-  body: string;
-}
-
 export interface ResumeData {
   basics: Basics;
   workExperience: WorkExperience[];
@@ -95,7 +101,8 @@ export interface ResumeData {
   skills: SkillCategory[];
   certifications: Certification[];
   languages: Language[];
+  references: Reference[];
+  hobbies: Hobby[];
   customSections: CustomSection[];
-  coverLetter: CoverLetter;
   sectionOrder: string[];
 }

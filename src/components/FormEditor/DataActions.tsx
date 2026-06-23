@@ -70,9 +70,10 @@ export const DataActions = () => {
         skills: [],
         certifications: [],
         languages: [],
-        sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages'],
+        references: [],
+        hobbies: [],
+        sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages', 'references', 'hobbies'],
         customSections: [],
-        coverLetter: { date: '', recipientName: '', recipientCompany: '', recipientAddress: '', subject: '', body: '' },
       };
       dispatch({ type: 'SET_RESUME_DATA', payload: emptyData });
     }

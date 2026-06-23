@@ -117,6 +117,23 @@ export const initialData: ResumeData = {
       proficiency: 'Professional Working',
     },
   ],
+  references: [
+    {
+      id: uuidv4(),
+      name: 'John Smith',
+      position: 'CTO',
+      company: 'Tech Innovators Inc.',
+      contactInfo: 'john.smith@example.com',
+      relationship: 'Former Manager',
+    }
+  ],
+  hobbies: [
+    {
+      id: uuidv4(),
+      name: 'Photography',
+      keywords: 'Landscape, Portrait, Editing',
+    }
+  ],
   customSections: [
     {
       id: '123',
@@ -132,13 +149,6 @@ export const initialData: ResumeData = {
       ]
     }
   ],
-  coverLetter: {
-    date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    recipientName: 'Hiring Manager',
-    recipientCompany: 'Tech Corp Inc.',
-    recipientAddress: '123 Innovation Drive\nSan Francisco, CA 94105',
-    subject: 'Application for Software Engineer Position',
-    body: 'Dear Hiring Manager,\n\nI am writing to express my strong interest in the Software Engineer position at Tech Corp Inc. With my background in full-stack development and passion for creating intuitive user experiences, I am confident in my ability to contribute effectively to your team.\n\nIn my previous role, I successfully spearheaded several key initiatives that resulted in significant performance improvements. I am particularly drawn to Tech Corp\'s mission and innovative approach to solving complex problems.\n\nThank you for considering my application. I look forward to the possibility of discussing how my skills and experiences align with your team\'s goals.\n\nSincerely,\nJane Doe',
-  },
-  sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages', 'custom_123'],
+  sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages', 'references', 'hobbies', 'custom_123'],
 };
+

@@ -8,9 +8,11 @@ import { SkillsForm } from './SkillsForm';
 import { CertificationsForm } from './CertificationsForm';
 import { LanguagesForm } from './LanguagesForm';
 import { CustomSectionForm } from './CustomSectionForm';
-import { CoverLetterForm } from './CoverLetterForm';
+import { ReferencesForm } from './ReferencesForm';
+import { HobbiesForm } from './HobbiesForm';
+
 import { DataActions } from './DataActions';
-import { ChevronDown, ChevronUp, User, Briefcase, GraduationCap, FolderDot, Wrench, Award, Languages, GripVertical, LayoutList, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, User, Briefcase, GraduationCap, FolderDot, Wrench, Award, Languages, GripVertical, LayoutList, Plus, Users, Heart } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { v4 as uuidv4 } from 'uuid';
@@ -57,7 +59,7 @@ const AccordionSection = ({ title, icon, isOpen, onToggle, children, dragHandleP
   );
 };
 
-export const FormEditor = ({ mode }: { mode: 'resume' | 'cover-letter' }) => {
+export const FormEditor = () => {
   const { state, dispatch } = useResume();
   const [openSection, setOpenSection] = useState<string>('basics');
 
@@ -82,6 +84,8 @@ export const FormEditor = ({ mode }: { mode: 'resume' | 'cover-letter' }) => {
     certifications: { title: "Certifications", icon: <Award size={20} />, component: <CertificationsForm /> },
     skills: { title: "Skills", icon: <Wrench size={20} />, component: <SkillsForm /> },
     languages: { title: "Languages", icon: <Languages size={20} />, component: <LanguagesForm /> },
+    references: { title: "References", icon: <Users size={20} />, component: <ReferencesForm /> },
+    hobbies: { title: "Hobbies & Interests", icon: <Heart size={20} />, component: <HobbiesForm /> },
   };
 
   const handleAddCustomSection = () => {
@@ -97,18 +101,13 @@ export const FormEditor = ({ mode }: { mode: 'resume' | 'cover-letter' }) => {
     <div className="flex flex-col h-full w-full">
       <div className="p-6 border-b border-[var(--glass-border)] bg-[var(--glass-header-bg)] backdrop-blur-md sticky top-0 z-10 flex items-center justify-between transition-colors duration-300">
         <div>
-          <h2 className="text-2xl font-black text-[var(--app-text)] tracking-widest uppercase transition-colors">{mode === 'cover-letter' ? 'Cover Letter' : 'Editor'}</h2>
+          <h2 className="text-2xl font-black text-[var(--app-text)] tracking-widest uppercase transition-colors">Editor</h2>
           <p className="text-xs text-[var(--app-text-muted)] mt-1 uppercase tracking-wider transition-colors">Real-time dynamic updates</p>
         </div>
       </div>
       
       <div className="flex-1 overflow-y-auto p-4 pb-20 scrollbar-thin scrollbar-thumb-[var(--app-text-muted)] scrollbar-track-transparent">
-        {mode === 'cover-letter' ? (
-          <div className="p-2">
-            <CoverLetterForm />
-          </div>
-        ) : (
-          <>
+        <>
             <DataActions />
             
             <AccordionSection
@@ -178,7 +177,6 @@ export const FormEditor = ({ mode }: { mode: 'resume' | 'cover-letter' }) => {
           </button>
         </div>
         </>
-        )}
       </div>
     </div>
   );
