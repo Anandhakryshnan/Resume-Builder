@@ -96,5 +96,26 @@ export const initialData: ResumeData = {
       ],
     },
   ],
-  sectionOrder: ['workExperience', 'education', 'projects', 'skills'],
+  certifications: [
+    {
+      id: uuidv4(),
+      name: 'AWS Certified Solutions Architect',
+      issuer: 'Amazon Web Services',
+      date: '2023',
+      url: 'https://aws.amazon.com',
+    },
+  ],
+  languages: [
+    {
+      id: uuidv4(),
+      name: 'English',
+      proficiency: 'Native',
+    },
+    {
+      id: uuidv4(),
+      name: 'Spanish',
+      proficiency: 'Professional Working',
+    },
+  ],
+  sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages'],
 };

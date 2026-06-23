@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory } from '../types/resume';
+import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory, Certification, Language } from '../types/resume';
 import { initialData } from '../utils/initialData';
 
 // Action Types
@@ -23,6 +23,14 @@ type Action =
   | { type: 'UPDATE_SKILL_CATEGORY'; payload: { id: string; data: Partial<SkillCategory> } }
   | { type: 'DELETE_SKILL_CATEGORY'; payload: string }
   | { type: 'REORDER_SKILL_CATEGORY'; payload: SkillCategory[] }
+  | { type: 'ADD_CERTIFICATION'; payload: Certification }
+  | { type: 'UPDATE_CERTIFICATION'; payload: { id: string; data: Partial<Certification> } }
+  | { type: 'DELETE_CERTIFICATION'; payload: string }
+  | { type: 'REORDER_CERTIFICATIONS'; payload: Certification[] }
+  | { type: 'ADD_LANGUAGE'; payload: Language }
+  | { type: 'UPDATE_LANGUAGE'; payload: { id: string; data: Partial<Language> } }
+  | { type: 'DELETE_LANGUAGE'; payload: string }
+  | { type: 'REORDER_LANGUAGES'; payload: Language[] }
   | { type: 'REORDER_MAIN_SECTIONS'; payload: string[] };
 
 const LOCAL_STORAGE_KEY = 'resume-builder-data';
@@ -107,6 +115,42 @@ const resumeReducer = (state: ResumeData, action: Action): ResumeData => {
     case 'REORDER_SKILL_CATEGORY':
       return { ...state, skills: action.payload };
 
+    // Certifications
+    case 'ADD_CERTIFICATION':
+      return { ...state, certifications: [...(state.certifications || []), action.payload] };
+    case 'UPDATE_CERTIFICATION':
+      return {
+        ...state,
+        certifications: (state.certifications || []).map((cert) =>
+          cert.id === action.payload.id ? { ...cert, ...action.payload.data } : cert
+        ),
+      };
+    case 'DELETE_CERTIFICATION':
+      return {
+        ...state,
+        certifications: (state.certifications || []).filter((cert) => cert.id !== action.payload),
+      };
+    case 'REORDER_CERTIFICATIONS':
+      return { ...state, certifications: action.payload };
+
+    // Languages
+    case 'ADD_LANGUAGE':
+      return { ...state, languages: [...(state.languages || []), action.payload] };
+    case 'UPDATE_LANGUAGE':
+      return {
+        ...state,
+        languages: (state.languages || []).map((lang) =>
+          lang.id === action.payload.id ? { ...lang, ...action.payload.data } : lang
+        ),
+      };
+    case 'DELETE_LANGUAGE':
+      return {
+        ...state,
+        languages: (state.languages || []).filter((lang) => lang.id !== action.payload),
+      };
+    case 'REORDER_LANGUAGES':
+      return { ...state, languages: action.payload };
+
     case 'REORDER_MAIN_SECTIONS':
       return { ...state, sectionOrder: action.payload };
 
@@ -128,9 +172,17 @@ const init = (initialState: ResumeData): ResumeData => {
     const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (localData) {
       const parsed = JSON.parse(localData);
+      
+      // Migrations
       if (!parsed.sectionOrder) {
-        parsed.sectionOrder = ['workExperience', 'education', 'projects', 'skills'];
+        parsed.sectionOrder = ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages'];
       }
+      if (!parsed.certifications) parsed.certifications = [];
+      if (!parsed.languages) parsed.languages = [];
+      
+      if (!parsed.sectionOrder.includes('certifications')) parsed.sectionOrder.push('certifications');
+      if (!parsed.sectionOrder.includes('languages')) parsed.sectionOrder.push('languages');
+
       return parsed;
     }
     return initialState;

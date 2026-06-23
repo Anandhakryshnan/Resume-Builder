@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useResume } from '../../context/ResumeContext';
 import { Mail, Phone, MapPin, Globe, ExternalLink } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const FONTS = [
   { name: 'Modern Clean', sans: "'Inter', sans-serif", serif: "'Inter', sans-serif" },
@@ -29,7 +30,7 @@ const TEMPLATES = [
 
 export const ResumePreview = () => {
   const { state } = useResume();
-  const { basics, workExperience, education, projects, skills } = state;
+  const { basics, workExperience, education, projects, skills, certifications = [], languages = [] } = state;
 
   const [activeFont, setActiveFont] = useState(FONTS[0]);
   const [activeColor, setActiveColor] = useState(COLORS[0]);
@@ -127,11 +128,17 @@ export const ResumePreview = () => {
               <div className={`text-sm font-bold mb-2 ${centered ? 'text-center' : ''}`} style={{ color: 'var(--color-primary)' }}>
                 {exp.company}
               </div>
-              {exp.summary && <p className={`text-sm text-gray-700 mb-2 leading-relaxed ${centered ? 'text-center' : ''}`}>{exp.summary}</p>}
+              {exp.summary && (
+                <div className={`text-sm text-gray-700 mb-2 leading-relaxed ${centered ? 'text-center' : ''} [&>p]:inline`}>
+                  <ReactMarkdown components={{ p: React.Fragment }}>{exp.summary}</ReactMarkdown>
+                </div>
+              )}
               {exp.bulletPoints.length > 0 && (
                 <ul className={`list-disc ${centered ? 'list-inside text-center' : 'pl-5'} text-sm text-gray-700 space-y-1.5`}>
                   {exp.bulletPoints.map((bullet) => (
-                    <li key={bullet.id}>{bullet.text}</li>
+                    <li key={bullet.id}>
+                      <ReactMarkdown components={{ p: React.Fragment }}>{bullet.text}</ReactMarkdown>
+                    </li>
                   ))}
                 </ul>
               )}
@@ -167,7 +174,11 @@ export const ResumePreview = () => {
                   {proj.techStack.join(' • ')}
                 </div>
               )}
-              {proj.description && <p className={`text-sm text-gray-700 leading-relaxed ${centered ? 'text-center' : ''}`}>{proj.description}</p>}
+              {proj.description && (
+                <div className={`text-sm text-gray-700 leading-relaxed ${centered ? 'text-center' : ''} [&>p]:inline`}>
+                  <ReactMarkdown components={{ p: React.Fragment }}>{proj.description}</ReactMarkdown>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -204,12 +215,69 @@ export const ResumePreview = () => {
     );
   };
 
+  const renderCertifications = (compact = false, timeline = false, centered = false) => {
+    if (certifications.length === 0) return null;
+    return (
+      <section className={`avoid-break ${compact ? 'mt-4' : 'mt-6'}`}>
+        <h2 className={`text-lg font-bold uppercase tracking-widest ${compact ? 'mb-3' : 'mb-4'} ${centered ? 'text-center border-b pb-2' : ''}`} style={{ color: 'var(--color-primary)' }}>
+          Certifications
+        </h2>
+        <div className="space-y-4">
+          {certifications.map((cert) => (
+            <div key={cert.id} className={`avoid-break relative ${timeline ? 'pl-6 border-l-2' : ''}`} style={{ borderColor: timeline ? 'var(--color-primary)' : 'transparent' }}>
+              {timeline && (
+                <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }}></div>
+              )}
+              <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                <h3 className="text-md font-bold text-gray-900 flex items-center gap-2">
+                  {cert.name}
+                  {cert.url && <a href={cert.url} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-gray-600 no-print"><ExternalLink size={14}/></a>}
+                </h3>
+                <span className={`text-sm font-semibold text-gray-500 whitespace-nowrap ${centered ? 'mt-0.5' : 'ml-4'}`}>{cert.date}</span>
+              </div>
+              <div className={`text-sm text-gray-700 font-medium ${centered ? 'text-center' : ''}`}>
+                {cert.issuer}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  const renderLanguages = (inverted = false, compact = false, centered = false) => {
+    if (languages.length === 0) return null;
+    const textColorClass = inverted ? 'text-white' : 'text-gray-900';
+    const subTextColorClass = inverted ? 'text-white/80' : 'text-gray-700';
+    const primaryColor = inverted ? 'white' : 'var(--color-primary)';
+
+    return (
+      <section className={`avoid-break ${compact ? 'mt-4' : 'mt-6'}`}>
+        <h2 className={`text-lg font-bold uppercase tracking-widest ${compact ? 'mb-2' : 'mb-3'} ${centered ? 'text-center' : ''}`} style={{ color: primaryColor }}>
+          Languages
+        </h2>
+        <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'} ${centered ? 'items-center text-center' : ''}`}>
+          {languages.map((lang) => (
+            <div key={lang.id} className={`avoid-break w-full flex ${centered ? 'flex-col' : 'justify-between'} items-baseline`}>
+              <h3 className={`text-sm font-bold ${textColorClass} mb-0.5`}>{lang.name}</h3>
+              <p className={`text-sm font-semibold ${subTextColorClass} leading-snug`}>
+                {lang.proficiency}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   const renderSectionById = (id: string, options: { compact?: boolean; timeline?: boolean; centered?: boolean; inverted?: boolean } = {}) => {
     switch (id) {
       case 'workExperience': return <div key={id}>{renderExperience(options.compact, options.timeline, options.centered)}</div>;
       case 'education': return <div key={id}>{renderEducation(options.compact, options.timeline, options.centered)}</div>;
       case 'projects': return <div key={id}>{renderProjects(options.compact, options.timeline, options.centered)}</div>;
       case 'skills': return <div key={id}>{renderSkills(options.inverted, options.compact, options.centered)}</div>;
+      case 'certifications': return <div key={id}>{renderCertifications(options.compact, options.timeline, options.centered)}</div>;
+      case 'languages': return <div key={id}>{renderLanguages(options.inverted, options.compact, options.centered)}</div>;
       default: return null;
     }
   };
@@ -226,9 +294,9 @@ export const ResumePreview = () => {
               </h1>
               {renderContactInfo(false, false, true)}
               {basics.summary && (
-                <p className="mt-5 text-sm text-gray-700 leading-relaxed max-w-2xl mx-auto italic font-serif">
-                  {basics.summary}
-                </p>
+                <div className="mt-5 text-sm text-gray-700 leading-relaxed max-w-2xl mx-auto italic font-serif [&>p]:inline">
+                  <ReactMarkdown components={{ p: React.Fragment }}>{basics.summary}</ReactMarkdown>
+                </div>
               )}
             </header>
             <div className="space-y-8">
@@ -250,9 +318,9 @@ export const ResumePreview = () => {
                 </div>
               </div>
               {basics.summary && (
-                <p className="mt-4 text-sm text-gray-700 leading-relaxed">
-                  {basics.summary}
-                </p>
+                <div className="mt-4 text-sm text-gray-700 leading-relaxed [&>p]:inline">
+                  <ReactMarkdown components={{ p: React.Fragment }}>{basics.summary}</ReactMarkdown>
+                </div>
               )}
             </header>
             <div className="flex gap-6 flex-1">
@@ -275,9 +343,9 @@ export const ResumePreview = () => {
               </h1>
               {renderContactInfo(false)}
               {basics.summary && (
-                <p className="mt-4 text-sm text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-md border-l-4" style={{ borderColor: 'var(--color-primary)' }}>
-                  {basics.summary}
-                </p>
+                <div className="mt-4 text-sm text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-md border-l-4 [&>p]:inline" style={{ borderColor: 'var(--color-primary)' }}>
+                  <ReactMarkdown components={{ p: React.Fragment }}>{basics.summary}</ReactMarkdown>
+                </div>
               )}
             </header>
             <div className="grid grid-cols-1 gap-6">
@@ -298,9 +366,9 @@ export const ResumePreview = () => {
               </h1>
               <div className="mb-6">{renderContactInfo(true)}</div>
               {basics.summary && (
-                <p className="text-sm text-gray-700 leading-relaxed mb-6 font-medium">
-                  {basics.summary}
-                </p>
+                <div className="text-sm text-gray-700 leading-relaxed mb-6 font-medium [&>p]:inline">
+                  <ReactMarkdown components={{ p: React.Fragment }}>{basics.summary}</ReactMarkdown>
+                </div>
               )}
               {state.sectionOrder.filter(id => id === 'workExperience').map(id => renderSectionById(id))}
             </div>
@@ -322,9 +390,9 @@ export const ResumePreview = () => {
             </div>
             <div className="w-2/3 border-l-2 pl-8 pb-10" style={{ borderColor: 'var(--color-primary)' }}>
               {basics.summary && (
-                <p className="text-sm text-gray-700 leading-relaxed mb-6 font-medium">
-                  {basics.summary}
-                </p>
+                <div className="text-sm text-gray-700 leading-relaxed mb-6 font-medium [&>p]:inline">
+                  <ReactMarkdown components={{ p: React.Fragment }}>{basics.summary}</ReactMarkdown>
+                </div>
               )}
               {state.sectionOrder.filter(id => id !== 'skills').map(id => renderSectionById(id))}
             </div>
@@ -340,9 +408,9 @@ export const ResumePreview = () => {
               </h1>
               {renderContactInfo(false)}
               {basics.summary && (
-                <p className="mt-4 text-sm text-gray-700 leading-relaxed max-w-3xl">
-                  {basics.summary}
-                </p>
+                <div className="mt-4 text-sm text-gray-700 leading-relaxed max-w-3xl [&>p]:inline">
+                  <ReactMarkdown components={{ p: React.Fragment }}>{basics.summary}</ReactMarkdown>
+                </div>
               )}
             </header>
             <div className="space-y-4">
@@ -362,9 +430,9 @@ export const ResumePreview = () => {
               </h1>
               {renderContactInfo(false)}
               {basics.summary && (
-                <p className="mt-5 text-sm text-gray-700 leading-relaxed max-w-2xl mx-auto">
-                  {basics.summary}
-                </p>
+                <div className="mt-5 text-sm text-gray-700 leading-relaxed max-w-2xl mx-auto [&>p]:inline">
+                  <ReactMarkdown components={{ p: React.Fragment }}>{basics.summary}</ReactMarkdown>
+                </div>
               )}
             </header>
             <div className="space-y-2">

@@ -50,11 +50,27 @@ export interface SkillCategory {
   }[];
 }
 
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+  url: string;
+}
+
+export interface Language {
+  id: string;
+  name: string;
+  proficiency: string;
+}
+
 export interface ResumeData {
   basics: Basics;
   workExperience: WorkExperience[];
   projects: Project[];
   education: Education[];
   skills: SkillCategory[];
+  certifications: Certification[];
+  languages: Language[];
   sectionOrder: string[];
 }

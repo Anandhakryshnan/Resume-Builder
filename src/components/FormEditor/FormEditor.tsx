@@ -5,7 +5,10 @@ import { WorkExperienceForm } from './WorkExperienceForm';
 import { EducationForm } from './EducationForm';
 import { ProjectsForm } from './ProjectsForm';
 import { SkillsForm } from './SkillsForm';
-import { ChevronDown, ChevronUp, User, Briefcase, GraduationCap, FolderDot, Wrench, GripVertical } from 'lucide-react';
+import { CertificationsForm } from './CertificationsForm';
+import { LanguagesForm } from './LanguagesForm';
+import { DataActions } from './DataActions';
+import { ChevronDown, ChevronUp, User, Briefcase, GraduationCap, FolderDot, Wrench, Award, Languages, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 
@@ -73,7 +76,9 @@ export const FormEditor = () => {
     workExperience: { title: "Work Experience", icon: <Briefcase size={20} />, component: <WorkExperienceForm /> },
     education: { title: "Education", icon: <GraduationCap size={20} />, component: <EducationForm /> },
     projects: { title: "Projects", icon: <FolderDot size={20} />, component: <ProjectsForm /> },
+    certifications: { title: "Certifications", icon: <Award size={20} />, component: <CertificationsForm /> },
     skills: { title: "Skills", icon: <Wrench size={20} />, component: <SkillsForm /> },
+    languages: { title: "Languages", icon: <Languages size={20} />, component: <LanguagesForm /> },
   };
 
   return (
@@ -85,7 +90,9 @@ export const FormEditor = () => {
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto pb-20 scrollbar-thin scrollbar-thumb-[var(--app-text-muted)] scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto p-4 pb-20 scrollbar-thin scrollbar-thumb-[var(--app-text-muted)] scrollbar-track-transparent">
+        <DataActions />
+        
         <AccordionSection
           title="Personal Details"
           icon={<User size={20} />}
