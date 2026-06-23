@@ -30,7 +30,7 @@ const TEMPLATES = [
 
 export const ResumePreview = () => {
   const { state } = useResume();
-  const { basics, workExperience, education, projects, skills, certifications = [], languages = [] } = state;
+  const { basics, workExperience, education, projects, skills, certifications = [], languages = [], customSections = [] } = state;
 
   const [activeFont, setActiveFont] = useState(FONTS[0]);
   const [activeColor, setActiveColor] = useState(COLORS[0]);
@@ -270,6 +270,41 @@ export const ResumePreview = () => {
     );
   };
 
+  const renderCustomSection = (customSectionId: string, compact = false, timeline = false, centered = false) => {
+    const section = customSections.find(s => s.id === customSectionId);
+    if (!section || section.items.length === 0) return null;
+    return (
+      <section className={`avoid-break ${compact ? 'mt-4' : 'mt-6'}`}>
+        <h2 className={`text-lg font-bold uppercase tracking-widest ${compact ? 'mb-3' : 'mb-4'} ${centered ? 'text-center border-b pb-2' : ''}`} style={{ color: 'var(--color-primary)' }}>
+          {section.name}
+        </h2>
+        <div className="space-y-5">
+          {section.items.map((item) => (
+            <div key={item.id} className={`avoid-break relative ${timeline ? 'pl-6 border-l-2' : ''}`} style={{ borderColor: timeline ? 'var(--color-primary)' : 'transparent' }}>
+              {timeline && (
+                <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }}></div>
+              )}
+              <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                <h3 className="text-md font-bold text-gray-900">{item.title}</h3>
+                {item.date && <span className={`text-sm font-semibold text-gray-500 whitespace-nowrap ${centered ? 'mt-0.5' : 'ml-4'}`}>{item.date}</span>}
+              </div>
+              {item.subtitle && (
+                <div className={`text-sm font-bold mb-2 ${centered ? 'text-center' : ''}`} style={{ color: 'var(--color-primary)' }}>
+                  {item.subtitle}
+                </div>
+              )}
+              {item.description && (
+                <div className={`text-sm text-gray-700 leading-relaxed ${centered ? 'text-center' : ''} [&>p]:inline`}>
+                  <ReactMarkdown components={{ p: React.Fragment }}>{item.description}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   const renderSectionById = (id: string, options: { compact?: boolean; timeline?: boolean; centered?: boolean; inverted?: boolean } = {}) => {
     switch (id) {
       case 'workExperience': return <div key={id}>{renderExperience(options.compact, options.timeline, options.centered)}</div>;
@@ -278,7 +313,12 @@ export const ResumePreview = () => {
       case 'skills': return <div key={id}>{renderSkills(options.inverted, options.compact, options.centered)}</div>;
       case 'certifications': return <div key={id}>{renderCertifications(options.compact, options.timeline, options.centered)}</div>;
       case 'languages': return <div key={id}>{renderLanguages(options.inverted, options.compact, options.centered)}</div>;
-      default: return null;
+      default: 
+        if (id.startsWith('custom_')) {
+          const customId = id.replace('custom_', '');
+          return <div key={id}>{renderCustomSection(customId, options.compact, options.timeline, options.centered)}</div>;
+        }
+        return null;
     }
   };
 

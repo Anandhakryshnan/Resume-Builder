@@ -117,5 +117,20 @@ export const initialData: ResumeData = {
       proficiency: 'Professional Working',
     },
   ],
-  sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages'],
+  customSections: [
+    {
+      id: '123',
+      name: 'Awards & Honors',
+      items: [
+        {
+          id: uuidv4(),
+          title: 'First Place Winner',
+          subtitle: 'Global Hackathon 2023',
+          date: 'Nov 2023',
+          description: 'Won 1st place out of 500+ teams by building an AI-powered accessibility tool.',
+        }
+      ]
+    }
+  ],
+  sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages', 'custom_123'],
 };

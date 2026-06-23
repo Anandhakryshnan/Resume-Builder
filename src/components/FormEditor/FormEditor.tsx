@@ -7,10 +7,12 @@ import { ProjectsForm } from './ProjectsForm';
 import { SkillsForm } from './SkillsForm';
 import { CertificationsForm } from './CertificationsForm';
 import { LanguagesForm } from './LanguagesForm';
+import { CustomSectionForm } from './CustomSectionForm';
 import { DataActions } from './DataActions';
-import { ChevronDown, ChevronUp, User, Briefcase, GraduationCap, FolderDot, Wrench, Award, Languages, GripVertical } from 'lucide-react';
+import { ChevronDown, ChevronUp, User, Briefcase, GraduationCap, FolderDot, Wrench, Award, Languages, GripVertical, LayoutList, Plus } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
+import { v4 as uuidv4 } from 'uuid';
 
 interface AccordionSectionProps {
   title: string;
@@ -81,6 +83,15 @@ export const FormEditor = () => {
     languages: { title: "Languages", icon: <Languages size={20} />, component: <LanguagesForm /> },
   };
 
+  const handleAddCustomSection = () => {
+    const newId = uuidv4();
+    dispatch({ 
+      type: 'ADD_CUSTOM_SECTION', 
+      payload: { id: newId, name: 'New Section', items: [] } 
+    });
+    setOpenSection(`custom_${newId}`);
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       <div className="p-6 border-b border-[var(--glass-border)] bg-[var(--glass-header-bg)] backdrop-blur-md sticky top-0 z-10 flex items-center justify-between transition-colors duration-300">
@@ -107,7 +118,20 @@ export const FormEditor = () => {
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {state.sectionOrder.map((sectionId, index) => {
-                  const config = sectionConfig[sectionId];
+                  let config = sectionConfig[sectionId];
+                  
+                  if (sectionId.startsWith('custom_')) {
+                    const customId = sectionId.replace('custom_', '');
+                    const customSection = state.customSections?.find(s => s.id === customId);
+                    if (customSection) {
+                      config = {
+                        title: customSection.name || 'Untitled Section',
+                        icon: <LayoutList size={20} />,
+                        component: <CustomSectionForm sectionId={customId} />
+                      };
+                    }
+                  }
+
                   if (!config) return null;
                   
                   return (
@@ -137,6 +161,15 @@ export const FormEditor = () => {
             )}
           </Droppable>
         </DragDropContext>
+
+        <div className="mt-6">
+          <button
+            onClick={handleAddCustomSection}
+            className="w-full py-4 border-2 border-dashed border-[var(--glass-border)] rounded-xl text-[var(--app-text)] hover:bg-[var(--glass-border)] transition-all duration-300 flex items-center justify-center gap-2 font-semibold"
+          >
+            <Plus size={18} /> Add Custom Section
+          </button>
+        </div>
       </div>
     </div>
   );

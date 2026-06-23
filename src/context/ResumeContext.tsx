@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory, Certification, Language } from '../types/resume';
+import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory, Certification, Language, CustomSection, CustomItem } from '../types/resume';
 import { initialData } from '../utils/initialData';
 
 // Action Types
@@ -31,6 +31,13 @@ type Action =
   | { type: 'UPDATE_LANGUAGE'; payload: { id: string; data: Partial<Language> } }
   | { type: 'DELETE_LANGUAGE'; payload: string }
   | { type: 'REORDER_LANGUAGES'; payload: Language[] }
+  | { type: 'ADD_CUSTOM_SECTION'; payload: CustomSection }
+  | { type: 'UPDATE_CUSTOM_SECTION'; payload: { id: string; name: string } }
+  | { type: 'DELETE_CUSTOM_SECTION'; payload: string }
+  | { type: 'ADD_CUSTOM_ITEM'; payload: { sectionId: string; item: CustomItem } }
+  | { type: 'UPDATE_CUSTOM_ITEM'; payload: { sectionId: string; itemId: string; data: Partial<CustomItem> } }
+  | { type: 'DELETE_CUSTOM_ITEM'; payload: { sectionId: string; itemId: string } }
+  | { type: 'REORDER_CUSTOM_ITEMS'; payload: { sectionId: string; items: CustomItem[] } }
   | { type: 'REORDER_MAIN_SECTIONS'; payload: string[] };
 
 const LOCAL_STORAGE_KEY = 'resume-builder-data';
@@ -151,6 +158,63 @@ const resumeReducer = (state: ResumeData, action: Action): ResumeData => {
     case 'REORDER_LANGUAGES':
       return { ...state, languages: action.payload };
 
+    // Custom Sections
+    case 'ADD_CUSTOM_SECTION':
+      return {
+        ...state,
+        customSections: [...(state.customSections || []), action.payload],
+        sectionOrder: [...state.sectionOrder, `custom_${action.payload.id}`]
+      };
+    case 'UPDATE_CUSTOM_SECTION':
+      return {
+        ...state,
+        customSections: (state.customSections || []).map(sec => 
+          sec.id === action.payload.id ? { ...sec, name: action.payload.name } : sec
+        )
+      };
+    case 'DELETE_CUSTOM_SECTION':
+      return {
+        ...state,
+        customSections: (state.customSections || []).filter(sec => sec.id !== action.payload),
+        sectionOrder: state.sectionOrder.filter(id => id !== `custom_${action.payload}`)
+      };
+    case 'ADD_CUSTOM_ITEM':
+      return {
+        ...state,
+        customSections: (state.customSections || []).map(sec => 
+          sec.id === action.payload.sectionId 
+            ? { ...sec, items: [...sec.items, action.payload.item] } 
+            : sec
+        )
+      };
+    case 'UPDATE_CUSTOM_ITEM':
+      return {
+        ...state,
+        customSections: (state.customSections || []).map(sec => 
+          sec.id === action.payload.sectionId 
+            ? { ...sec, items: sec.items.map(item => item.id === action.payload.itemId ? { ...item, ...action.payload.data } : item) } 
+            : sec
+        )
+      };
+    case 'DELETE_CUSTOM_ITEM':
+      return {
+        ...state,
+        customSections: (state.customSections || []).map(sec => 
+          sec.id === action.payload.sectionId 
+            ? { ...sec, items: sec.items.filter(item => item.id !== action.payload.itemId) } 
+            : sec
+        )
+      };
+    case 'REORDER_CUSTOM_ITEMS':
+      return {
+        ...state,
+        customSections: (state.customSections || []).map(sec => 
+          sec.id === action.payload.sectionId 
+            ? { ...sec, items: action.payload.items } 
+            : sec
+        )
+      };
+
     case 'REORDER_MAIN_SECTIONS':
       return { ...state, sectionOrder: action.payload };
 
@@ -179,6 +243,7 @@ const init = (initialState: ResumeData): ResumeData => {
       }
       if (!parsed.certifications) parsed.certifications = [];
       if (!parsed.languages) parsed.languages = [];
+      if (!parsed.customSections) parsed.customSections = [];
       
       if (!parsed.sectionOrder.includes('certifications')) parsed.sectionOrder.push('certifications');
       if (!parsed.sectionOrder.includes('languages')) parsed.sectionOrder.push('languages');

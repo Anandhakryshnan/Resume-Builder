@@ -64,6 +64,20 @@ export interface Language {
   proficiency: string;
 }
 
+export interface CustomItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  description: string;
+}
+
+export interface CustomSection {
+  id: string;
+  name: string;
+  items: CustomItem[];
+}
+
 export interface ResumeData {
   basics: Basics;
   workExperience: WorkExperience[];
@@ -72,5 +86,6 @@ export interface ResumeData {
   skills: SkillCategory[];
   certifications: Certification[];
   languages: Language[];
+  customSections: CustomSection[];
   sectionOrder: string[];
 }
