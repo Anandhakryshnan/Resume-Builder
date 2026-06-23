@@ -96,4 +96,5 @@ export const initialData: ResumeData = {
       ],
     },
   ],
+  sectionOrder: ['workExperience', 'education', 'projects', 'skills'],
 };

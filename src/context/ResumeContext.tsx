@@ -22,7 +22,8 @@ type Action =
   | { type: 'ADD_SKILL_CATEGORY'; payload: SkillCategory }
   | { type: 'UPDATE_SKILL_CATEGORY'; payload: { id: string; data: Partial<SkillCategory> } }
   | { type: 'DELETE_SKILL_CATEGORY'; payload: string }
-  | { type: 'REORDER_SKILL_CATEGORY'; payload: SkillCategory[] };
+  | { type: 'REORDER_SKILL_CATEGORY'; payload: SkillCategory[] }
+  | { type: 'REORDER_MAIN_SECTIONS'; payload: string[] };
 
 const LOCAL_STORAGE_KEY = 'resume-builder-data';
 
@@ -106,6 +107,9 @@ const resumeReducer = (state: ResumeData, action: Action): ResumeData => {
     case 'REORDER_SKILL_CATEGORY':
       return { ...state, skills: action.payload };
 
+    case 'REORDER_MAIN_SECTIONS':
+      return { ...state, sectionOrder: action.payload };
+
     default:
       return state;
   }
@@ -122,7 +126,14 @@ const ResumeContext = createContext<ResumeContextProps | undefined>(undefined);
 const init = (initialState: ResumeData): ResumeData => {
   try {
     const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return localData ? JSON.parse(localData) : initialState;
+    if (localData) {
+      const parsed = JSON.parse(localData);
+      if (!parsed.sectionOrder) {
+        parsed.sectionOrder = ['workExperience', 'education', 'projects', 'skills'];
+      }
+      return parsed;
+    }
+    return initialState;
   } catch (error) {
     console.error('Failed to parse resume data from local storage', error);
     return initialState;

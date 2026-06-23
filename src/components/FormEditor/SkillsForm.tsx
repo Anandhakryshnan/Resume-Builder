@@ -1,7 +1,9 @@
 import { useResume } from '../../context/ResumeContext';
 import { v4 as uuidv4 } from 'uuid';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, GripVertical } from 'lucide-react';
 import type { SkillCategory } from '../../types/resume';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 
 export const SkillsForm = () => {
   const { state, dispatch } = useResume();
@@ -60,10 +62,36 @@ export const SkillsForm = () => {
     }
   };
 
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(skills);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    dispatch({ type: 'REORDER_SKILL_CATEGORY', payload: items });
+  };
+
   return (
     <div className="space-y-6">
-      {skills.map((category) => (
-        <div key={category.id} className="p-5 border border-[var(--glass-border)] rounded-2xl bg-white/5 relative group hover:bg-white/10 transition-colors">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="skills-list">
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-6">
+              {skills.map((category, index) => (
+                <Draggable key={category.id} draggableId={category.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={`p-5 border border-[var(--glass-border)] rounded-2xl bg-white/5 relative group hover:bg-white/10 transition-colors ${snapshot.isDragging ? 'shadow-lg ring-2 ring-white' : ''}`}
+                    >
+                      <div 
+                        {...provided.dragHandleProps} 
+                        className="absolute left-2 top-4 text-[var(--app-text-muted)] hover:text-slate-200 cursor-grab active:cursor-grabbing"
+                      >
+                        <GripVertical size={18} />
+                      </div>
           <button
             onClick={() => handleDeleteCategory(category.id)}
             className="absolute top-4 right-4 text-[var(--app-text-muted)] hover:text-rose-400 transition-colors"
@@ -72,7 +100,7 @@ export const SkillsForm = () => {
             <Trash2 size={18} />
           </button>
           
-          <div className="pr-8 mb-4">
+          <div className="pl-6 pr-8 mb-4">
             <input
               type="text"
               value={category.name}
@@ -107,8 +135,15 @@ export const SkillsForm = () => {
               <Plus size={14} /> Add Skill
             </button>
           </div>
-        </div>
-      ))}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       <button
         onClick={handleAddCategory}

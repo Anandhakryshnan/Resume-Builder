@@ -204,6 +204,16 @@ export const ResumePreview = () => {
     );
   };
 
+  const renderSectionById = (id: string, options: { compact?: boolean; timeline?: boolean; centered?: boolean; inverted?: boolean } = {}) => {
+    switch (id) {
+      case 'workExperience': return <div key={id}>{renderExperience(options.compact, options.timeline, options.centered)}</div>;
+      case 'education': return <div key={id}>{renderEducation(options.compact, options.timeline, options.centered)}</div>;
+      case 'projects': return <div key={id}>{renderProjects(options.compact, options.timeline, options.centered)}</div>;
+      case 'skills': return <div key={id}>{renderSkills(options.inverted, options.compact, options.centered)}</div>;
+      default: return null;
+    }
+  };
+
   const renderLayout = () => {
     switch (activeTemplate.id) {
 
@@ -211,7 +221,7 @@ export const ResumePreview = () => {
         return (
           <div className="bg-white flex-1">
             <header className="border-b-4 pb-6 mb-6 avoid-break flex flex-col items-center text-center" style={{ borderColor: 'var(--color-primary)' }}>
-              <h1 className="text-5xl font-bold tracking-wider mb-3 text-gray-900" style={{ fontFamily: 'var(--font-serif)' }}>
+              <h1 className="text-5xl font-bold tracking-wider mb-3 text-black" style={{ fontFamily: 'var(--font-serif)' }}>
                 {basics.name || 'Your Name'}
               </h1>
               {renderContactInfo(false, false, true)}
@@ -222,10 +232,7 @@ export const ResumePreview = () => {
               )}
             </header>
             <div className="space-y-8">
-              {renderExperience(false, false, true)}
-              {renderEducation(false, false, true)}
-              {renderProjects(false, false, true)}
-              {renderSkills(false, false, true)}
+              {state.sectionOrder.map(id => renderSectionById(id, { centered: true }))}
             </div>
           </div>
         );
@@ -236,7 +243,7 @@ export const ResumePreview = () => {
             <header className="border-b-2 pb-4 mb-4 avoid-break" style={{ borderColor: 'var(--color-primary)' }}>
               <div className="flex justify-between items-end">
                 <div>
-                  <h1 className="text-3xl font-black uppercase tracking-wider mb-2 text-gray-900" style={{ fontFamily: 'var(--font-serif)' }}>
+                  <h1 className="text-3xl font-black uppercase tracking-wider mb-2 text-black" style={{ fontFamily: 'var(--font-serif)' }}>
                     {basics.name || 'Your Name'}
                   </h1>
                   {renderContactInfo(false)}
@@ -250,12 +257,10 @@ export const ResumePreview = () => {
             </header>
             <div className="flex gap-6 flex-1">
               <div className="w-[60%]">
-                {renderExperience(true)}
+                {state.sectionOrder.filter(id => id === 'workExperience').map(id => renderSectionById(id, { compact: true }))}
               </div>
               <div className="w-[40%] flex flex-col gap-2">
-                {renderEducation(true)}
-                {renderProjects(true)}
-                {renderSkills(false, true)}
+                {state.sectionOrder.filter(id => id !== 'workExperience').map(id => renderSectionById(id, { compact: true }))}
               </div>
             </div>
           </div>
@@ -265,7 +270,7 @@ export const ResumePreview = () => {
         return (
           <div className="bg-white flex-1">
             <header className="mb-8 avoid-break">
-              <h1 className="text-4xl font-black uppercase tracking-wider mb-4 text-gray-900" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
+              <h1 className="text-4xl font-black uppercase tracking-wider mb-4 text-black" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
                 {basics.name || 'Your Name'}
               </h1>
               {renderContactInfo(false)}
@@ -276,11 +281,9 @@ export const ResumePreview = () => {
               )}
             </header>
             <div className="grid grid-cols-1 gap-6">
-              {renderExperience(false, true)}
-              {renderEducation(false, true)}
+              {state.sectionOrder.filter(id => id === 'workExperience' || id === 'education').map(id => renderSectionById(id, { timeline: true }))}
               <div className="grid grid-cols-2 gap-6">
-                {renderProjects(false, false)}
-                {renderSkills()}
+                {state.sectionOrder.filter(id => id === 'projects' || id === 'skills').map(id => renderSectionById(id))}
               </div>
             </div>
           </div>
@@ -290,7 +293,7 @@ export const ResumePreview = () => {
         return (
           <div className="flex flex-1 gap-8 bg-white">
             <div className="w-1/2 flex flex-col">
-              <h1 className="text-4xl font-black uppercase tracking-wider mb-2 text-gray-900" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
+              <h1 className="text-4xl font-black uppercase tracking-wider mb-2 text-black" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
                 {basics.name || 'Your Name'}
               </h1>
               <div className="mb-6">{renderContactInfo(true)}</div>
@@ -299,12 +302,10 @@ export const ResumePreview = () => {
                   {basics.summary}
                 </p>
               )}
-              {renderExperience()}
+              {state.sectionOrder.filter(id => id === 'workExperience').map(id => renderSectionById(id))}
             </div>
             <div className="w-1/2 border-l pl-8 border-gray-200">
-              {renderEducation()}
-              {renderProjects()}
-              {renderSkills()}
+              {state.sectionOrder.filter(id => id !== 'workExperience').map(id => renderSectionById(id))}
             </div>
           </div>
         );
@@ -313,11 +314,11 @@ export const ResumePreview = () => {
         return (
           <div className="flex gap-8 bg-white flex-1">
             <div className="w-1/3">
-              <h1 className="text-4xl font-black uppercase tracking-wider mb-6 text-gray-900" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
+              <h1 className="text-4xl font-black uppercase tracking-wider mb-6 text-black" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
                 {basics.name || 'Your Name'}
               </h1>
               {renderContactInfo(true)}
-              {renderSkills()}
+              {state.sectionOrder.filter(id => id === 'skills').map(id => renderSectionById(id, { inverted: false }))}
             </div>
             <div className="w-2/3 border-l-2 pl-8 pb-10" style={{ borderColor: 'var(--color-primary)' }}>
               {basics.summary && (
@@ -325,9 +326,7 @@ export const ResumePreview = () => {
                   {basics.summary}
                 </p>
               )}
-              {renderExperience()}
-              {renderEducation()}
-              {renderProjects()}
+              {state.sectionOrder.filter(id => id !== 'skills').map(id => renderSectionById(id))}
             </div>
           </div>
         );
@@ -336,7 +335,7 @@ export const ResumePreview = () => {
         return (
           <div className="bg-white flex-1">
             <header className="mb-6 avoid-break">
-              <h1 className="text-3xl font-black uppercase tracking-widest mb-3 text-gray-900" style={{ fontFamily: 'var(--font-serif)' }}>
+              <h1 className="text-3xl font-black uppercase tracking-widest mb-3 text-black" style={{ fontFamily: 'var(--font-serif)' }}>
                 {basics.name || 'Your Name'}
               </h1>
               {renderContactInfo(false)}
@@ -348,10 +347,7 @@ export const ResumePreview = () => {
             </header>
             <div className="space-y-4">
               <div className={activeTemplate.id === 'minimalist' ? 'border-t border-gray-300 pt-2' : ''}></div>
-              {renderExperience()}
-              {renderEducation()}
-              {renderProjects()}
-              {renderSkills()}
+              {state.sectionOrder.map(id => renderSectionById(id))}
             </div>
           </div>
         );
@@ -361,7 +357,7 @@ export const ResumePreview = () => {
         return (
           <div className="bg-white flex-1">
             <header className="border-b-4 pb-6 mb-6 avoid-break flex flex-col items-center text-center" style={{ borderColor: 'var(--color-primary)' }}>
-              <h1 className="text-4xl font-bold uppercase tracking-wider mb-3 text-gray-900" style={{ fontFamily: 'var(--font-serif)' }}>
+              <h1 className="text-4xl font-bold uppercase tracking-wider mb-3 text-black" style={{ fontFamily: 'var(--font-serif)' }}>
                 {basics.name || 'Your Name'}
               </h1>
               {renderContactInfo(false)}
@@ -372,10 +368,7 @@ export const ResumePreview = () => {
               )}
             </header>
             <div className="space-y-2">
-              {renderExperience()}
-              {renderEducation()}
-              {renderProjects()}
-              {renderSkills()}
+              {state.sectionOrder.map(id => renderSectionById(id))}
             </div>
           </div>
         );
@@ -393,7 +386,7 @@ export const ResumePreview = () => {
             value={activeTemplate.id}
             onChange={(e) => setActiveTemplate(TEMPLATES.find(t => t.id === e.target.value) || TEMPLATES[0])}
           >
-            {TEMPLATES.map(t => <option key={t.id} value={t.id} className="text-gray-900">{t.name}</option>)}
+            {TEMPLATES.map(t => <option key={t.id} value={t.id} className="bg-[var(--app-bg-color)] text-[var(--app-text)]">{t.name}</option>)}
           </select>
         </div>
 
@@ -404,7 +397,7 @@ export const ResumePreview = () => {
             value={activeFont.name}
             onChange={(e) => setActiveFont(FONTS.find(f => f.name === e.target.value) || FONTS[0])}
           >
-            {FONTS.map(f => <option key={f.name} value={f.name} className="text-gray-900">{f.name}</option>)}
+            {FONTS.map(f => <option key={f.name} value={f.name} className="bg-[var(--app-bg-color)] text-[var(--app-text)]">{f.name}</option>)}
           </select>
         </div>
 

@@ -1,7 +1,9 @@
 import { useResume } from '../../context/ResumeContext';
 import { v4 as uuidv4 } from 'uuid';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, GripVertical } from 'lucide-react';
 import type { Project } from '../../types/resume';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 
 export const ProjectsForm = () => {
   const { state, dispatch } = useResume();
@@ -30,10 +32,36 @@ export const ProjectsForm = () => {
     });
   };
 
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(projects);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    dispatch({ type: 'REORDER_PROJECT', payload: items });
+  };
+
   return (
     <div className="space-y-6">
-      {projects.map((proj, index) => (
-        <div key={proj.id} className="p-5 border border-[var(--glass-border)] rounded-2xl bg-white/5 relative group hover:bg-white/10 transition-colors">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="projects-list">
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-6">
+              {projects.map((proj, index) => (
+                <Draggable key={proj.id} draggableId={proj.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={`p-5 border border-[var(--glass-border)] rounded-2xl bg-white/5 relative group hover:bg-white/10 transition-colors ${snapshot.isDragging ? 'shadow-lg ring-2 ring-white' : ''}`}
+                    >
+                      <div 
+                        {...provided.dragHandleProps} 
+                        className="absolute left-2 top-4 text-[var(--app-text-muted)] hover:text-slate-200 cursor-grab active:cursor-grabbing"
+                      >
+                        <GripVertical size={18} />
+                      </div>
           <button
             onClick={() => handleDelete(proj.id)}
             className="absolute top-4 right-4 text-[var(--app-text-muted)] hover:text-rose-400 transition-colors"
@@ -42,9 +70,9 @@ export const ProjectsForm = () => {
             <Trash2 size={18} />
           </button>
           
-          <h3 className="text-sm font-semibold text-slate-200 mb-4 pr-8">Project {index + 1}</h3>
+          <h3 className="text-sm font-semibold text-slate-200 mb-4 pl-6 pr-8">Project {index + 1}</h3>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 pl-6">
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-[var(--app-text)] mb-1">Project Title</label>
               <input
@@ -99,8 +127,15 @@ export const ProjectsForm = () => {
               />
             </div>
           </div>
-        </div>
-      ))}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       <button
         onClick={handleAdd}
