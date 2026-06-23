@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory, Certification, Language, CustomSection, CustomItem } from '../types/resume';
+import type { ResumeData, Basics, WorkExperience, Education, Project, SkillCategory, Certification, Language, CustomSection, CustomItem, CoverLetter } from '../types/resume';
 import { initialData } from '../utils/initialData';
 
 // Action Types
@@ -38,7 +38,8 @@ type Action =
   | { type: 'UPDATE_CUSTOM_ITEM'; payload: { sectionId: string; itemId: string; data: Partial<CustomItem> } }
   | { type: 'DELETE_CUSTOM_ITEM'; payload: { sectionId: string; itemId: string } }
   | { type: 'REORDER_CUSTOM_ITEMS'; payload: { sectionId: string; items: CustomItem[] } }
-  | { type: 'REORDER_MAIN_SECTIONS'; payload: string[] };
+  | { type: 'REORDER_MAIN_SECTIONS'; payload: string[] }
+  | { type: 'UPDATE_COVER_LETTER'; payload: Partial<CoverLetter> };
 
 const LOCAL_STORAGE_KEY = 'resume-builder-data';
 
@@ -218,6 +219,12 @@ const resumeReducer = (state: ResumeData, action: Action): ResumeData => {
     case 'REORDER_MAIN_SECTIONS':
       return { ...state, sectionOrder: action.payload };
 
+    case 'UPDATE_COVER_LETTER':
+      return { ...state, coverLetter: { ...state.coverLetter, ...action.payload } };
+
+    case 'IMPORT_DATA':
+      return state;
+
     default:
       return state;
   }
@@ -244,6 +251,7 @@ const init = (initialState: ResumeData): ResumeData => {
       if (!parsed.certifications) parsed.certifications = [];
       if (!parsed.languages) parsed.languages = [];
       if (!parsed.customSections) parsed.customSections = [];
+      if (!parsed.coverLetter) parsed.coverLetter = initialData.coverLetter;
       
       if (!parsed.sectionOrder.includes('certifications')) parsed.sectionOrder.push('certifications');
       if (!parsed.sectionOrder.includes('languages')) parsed.sectionOrder.push('languages');

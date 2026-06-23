@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { ResumeProvider } from './context/ResumeContext';
 import { FormEditor } from './components/FormEditor/FormEditor';
 import { ResumePreview } from './components/ResumePreview/ResumePreview';
-import { FileDown, FileSignature, Sun, Moon } from 'lucide-react';
+import { FileDown, FileSignature, Sun, Moon, FileText, MailOpen } from 'lucide-react';
 
-const Header = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void }) => {
+export type AppMode = 'resume' | 'cover-letter';
+
+const Header = ({ theme, toggleTheme, mode, setMode }: { theme: string, toggleTheme: () => void, mode: AppMode, setMode: (mode: AppMode) => void }) => {
   const handleExportPDF = () => {
     window.print();
   };
@@ -21,6 +23,20 @@ const Header = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
           </span>
         </h1>
         <div className="flex items-center gap-4">
+          <div className="flex bg-[var(--btn-bg)] border border-[var(--btn-border)] rounded-full p-1 mr-2">
+            <button
+              onClick={() => setMode('resume')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${mode === 'resume' ? 'bg-[var(--accent-color)] text-[var(--accent-color-inverse)] shadow-md' : 'text-[var(--app-text)] hover:text-[var(--accent-color)]'}`}
+            >
+              <FileText size={16} /> Resume
+            </button>
+            <button
+              onClick={() => setMode('cover-letter')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${mode === 'cover-letter' ? 'bg-[var(--accent-color)] text-[var(--accent-color-inverse)] shadow-md' : 'text-[var(--app-text)] hover:text-[var(--accent-color)]'}`}
+            >
+              <MailOpen size={16} /> Cover Letter
+            </button>
+          </div>
           <button
             onClick={toggleTheme}
             className="p-2.5 rounded-full bg-[var(--btn-bg)] hover:bg-[var(--btn-hover-bg)] text-[var(--app-text)] border border-[var(--btn-border)] transition-all duration-300 hover:scale-110"
@@ -45,6 +61,7 @@ function App() {
     const saved = localStorage.getItem('theme');
     return (saved as 'dark' | 'light') || 'dark';
   });
+  const [mode, setMode] = useState<AppMode>('resume');
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
@@ -60,17 +77,17 @@ function App() {
   return (
     <ResumeProvider>
       <div className="min-h-screen flex flex-col relative overflow-hidden bg-[var(--app-bg-color)] transition-colors duration-300">
-        <Header theme={theme} toggleTheme={toggleTheme} />
+        <Header theme={theme} toggleTheme={toggleTheme} mode={mode} setMode={setMode} />
         
         <main className="flex-1 flex flex-col lg:flex-row gap-6 p-4 pb-0 max-w-[1600px] mx-auto w-full relative z-10 h-[calc(100vh-130px)]">
           <div className="w-full lg:w-[400px] xl:w-[450px] glass-panel rounded-2xl overflow-hidden shadow-2xl flex flex-col h-full relative group transition-all duration-300">
             {/* Soft inner glow */}
             <div className="absolute inset-0 bg-gradient-to-b from-[var(--glass-border)] to-transparent pointer-events-none opacity-50"></div>
-            <FormEditor />
+            <FormEditor mode={mode} />
           </div>
           
           <div className="flex-1 overflow-y-auto rounded-2xl shadow-2xl h-full scrollbar-thin scrollbar-thumb-[var(--app-text-muted)] scrollbar-track-transparent print-wrapper transition-all duration-300">
-            <ResumePreview />
+            <ResumePreview mode={mode} />
           </div>
         </main>
         

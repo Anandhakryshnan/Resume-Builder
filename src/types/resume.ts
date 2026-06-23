@@ -78,6 +78,15 @@ export interface CustomSection {
   items: CustomItem[];
 }
 
+export interface CoverLetter {
+  date: string;
+  recipientName: string;
+  recipientCompany: string;
+  recipientAddress: string;
+  subject: string;
+  body: string;
+}
+
 export interface ResumeData {
   basics: Basics;
   workExperience: WorkExperience[];
@@ -87,5 +96,6 @@ export interface ResumeData {
   certifications: Certification[];
   languages: Language[];
   customSections: CustomSection[];
+  coverLetter: CoverLetter;
   sectionOrder: string[];
 }

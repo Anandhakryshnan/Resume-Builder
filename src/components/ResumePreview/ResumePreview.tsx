@@ -28,9 +28,9 @@ const TEMPLATES = [
   { id: 'creative-duo', name: 'Creative Duo' }
 ];
 
-export const ResumePreview = () => {
+export const ResumePreview = ({ mode }: { mode: 'resume' | 'cover-letter' }) => {
   const { state } = useResume();
-  const { basics, workExperience, education, projects, skills, certifications = [], languages = [], customSections = [] } = state;
+  const { basics, workExperience, education, projects, skills, certifications = [], languages = [], customSections = [], coverLetter } = state;
 
   const [activeFont, setActiveFont] = useState(FONTS[0]);
   const [activeColor, setActiveColor] = useState(COLORS[0]);
@@ -483,6 +483,88 @@ export const ResumePreview = () => {
     }
   };
 
+  const renderCoverLetterBody = (className = '') => {
+    if (!coverLetter) return null;
+    return (
+      <div className={`text-gray-900 leading-relaxed text-[15px] ${className}`}>
+        <div className="mb-8">
+          <p>{coverLetter.date}</p>
+        </div>
+        <div className="mb-8 leading-snug">
+          <p className="font-bold">{coverLetter.recipientName}</p>
+          <p>{coverLetter.recipientCompany}</p>
+          {coverLetter.recipientAddress && (
+            <div className="whitespace-pre-line mt-1">{coverLetter.recipientAddress}</div>
+          )}
+        </div>
+        {coverLetter.subject && (
+          <div className="mb-8 font-bold text-lg pb-1 inline-block border-b-2" style={{ borderColor: 'var(--color-primary)' }}>
+            RE: {coverLetter.subject}
+          </div>
+        )}
+        <div className="whitespace-pre-wrap [&>p]:mb-4">
+          <ReactMarkdown components={{ p: React.Fragment }}>{coverLetter.body}</ReactMarkdown>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCoverLetterLayout = () => {
+    switch (activeTemplate.id) {
+      case 'centered':
+      case 'classic':
+      case 'minimalist':
+      case 'timeline':
+      case 'compact':
+        return (
+          <div className="bg-white flex-1 flex flex-col">
+            <header className={`${activeTemplate.id === 'centered' ? 'border-b-4 pb-6 flex flex-col items-center text-center' : activeTemplate.id === 'classic' ? 'border-b-4 pb-6 flex flex-col items-center text-center' : activeTemplate.id === 'compact' ? 'border-b-2 pb-4' : 'mb-6'} avoid-break`} style={{ borderColor: 'var(--color-primary)' }}>
+              <h1 className={`${activeTemplate.id === 'centered' ? 'text-5xl font-bold tracking-wider mb-3 text-black' : activeTemplate.id === 'classic' ? 'text-4xl font-bold uppercase tracking-wider mb-3 text-black' : activeTemplate.id === 'timeline' ? 'text-4xl font-black uppercase tracking-wider mb-4' : activeTemplate.id === 'compact' ? 'text-3xl font-black uppercase tracking-wider mb-2 text-black' : 'text-3xl font-black uppercase tracking-widest mb-3 text-black'}`} style={{ fontFamily: 'var(--font-serif)', color: activeTemplate.id === 'timeline' ? 'var(--color-primary)' : 'inherit' }}>
+                {basics.name || 'Your Name'}
+              </h1>
+              {renderContactInfo(false, false, activeTemplate.id === 'centered' || activeTemplate.id === 'classic')}
+            </header>
+            <div className={`flex-1 ${activeTemplate.id === 'centered' || activeTemplate.id === 'classic' ? 'px-8 mt-12' : 'mt-8'}`}>
+              {renderCoverLetterBody()}
+            </div>
+          </div>
+        );
+
+      case 'creative-duo':
+        return (
+          <div className="flex flex-1 gap-8 bg-white h-full">
+            <div className="w-1/3 flex flex-col">
+              <h1 className="text-4xl font-black uppercase tracking-wider mb-2 text-black" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
+                {basics.name || 'Your Name'}
+              </h1>
+              <div className="mb-6">{renderContactInfo(true)}</div>
+            </div>
+            <div className="w-2/3 border-l pl-8 border-gray-200 py-4">
+              {renderCoverLetterBody()}
+            </div>
+          </div>
+        );
+
+      case 'modern':
+        return (
+          <div className="flex flex-1 gap-8 bg-white h-full">
+            <div className="w-1/3 flex flex-col">
+              <h1 className="text-4xl font-black uppercase tracking-wider mb-6 text-black" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)' }}>
+                {basics.name || 'Your Name'}
+              </h1>
+              {renderContactInfo(true)}
+            </div>
+            <div className="w-2/3 border-l-2 pl-8 pb-10" style={{ borderColor: 'var(--color-primary)' }}>
+              {renderCoverLetterBody()}
+            </div>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex flex-col items-center w-full max-w-full">
       {/* Controls Bar */}
@@ -540,8 +622,8 @@ export const ResumePreview = () => {
       {/* A4 Canvas */}
       <div className="resume-canvas flex flex-col w-[210mm] min-h-[297mm] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] print:shadow-none p-[20mm] box-border text-[var(--color-primary-text)] mx-auto relative group">
         <div className="absolute inset-0 bg-gradient-to-tr from-white to-gray-50 opacity-50 pointer-events-none no-print"></div>
-        <div className="relative z-10 flex flex-col flex-1 w-full">
-          {renderLayout()}
+        <div className="relative z-10 flex flex-col flex-1 w-full h-full">
+          {mode === 'cover-letter' ? renderCoverLetterLayout() : renderLayout()}
         </div>
       </div>
     </div>
