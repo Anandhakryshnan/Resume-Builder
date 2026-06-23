@@ -71,6 +71,8 @@ export const DataActions = () => {
         certifications: [],
         languages: [],
         sectionOrder: ['workExperience', 'education', 'projects', 'certifications', 'skills', 'languages'],
+        customSections: [],
+        coverLetter: { date: '', recipientName: '', recipientCompany: '', recipientAddress: '', subject: '', body: '' },
       };
       dispatch({ type: 'SET_RESUME_DATA', payload: emptyData });
     }

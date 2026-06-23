@@ -222,9 +222,6 @@ const resumeReducer = (state: ResumeData, action: Action): ResumeData => {
     case 'UPDATE_COVER_LETTER':
       return { ...state, coverLetter: { ...state.coverLetter, ...action.payload } };
 
-    case 'IMPORT_DATA':
-      return state;
-
     default:
       return state;
   }

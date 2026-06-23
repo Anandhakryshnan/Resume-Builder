@@ -1,4 +1,3 @@
-import React from 'react';
 import { useResume } from '../../context/ResumeContext';
 
 export const CoverLetterForm = () => {
