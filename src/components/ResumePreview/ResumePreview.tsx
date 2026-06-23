@@ -620,10 +620,14 @@ export const ResumePreview = ({ mode }: { mode: 'resume' | 'cover-letter' }) => 
       </div>
 
       {/* A4 Canvas */}
-      <div className="resume-canvas flex flex-col w-[210mm] min-h-[297mm] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] print:shadow-none p-[20mm] box-border text-[var(--color-primary-text)] mx-auto relative group">
-        <div className="absolute inset-0 bg-gradient-to-tr from-white to-gray-50 opacity-50 pointer-events-none no-print"></div>
-        <div className="relative z-10 flex flex-col flex-1 w-full h-full">
-          {mode === 'cover-letter' ? renderCoverLetterLayout() : renderLayout()}
+      <div className="w-full overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-thin scrollbar-thumb-[var(--app-text-muted)] scrollbar-track-transparent">
+        <div className="min-w-[210mm] flex justify-center">
+          <div className="resume-canvas flex flex-col w-[210mm] min-h-[297mm] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] print:shadow-none p-[20mm] box-border text-[var(--color-primary-text)] relative group">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white to-gray-50 opacity-50 pointer-events-none no-print"></div>
+            <div className="relative z-10 flex flex-col flex-1 w-full h-full">
+              {mode === 'cover-letter' ? renderCoverLetterLayout() : renderLayout()}
+            </div>
+          </div>
         </div>
       </div>
     </div>
