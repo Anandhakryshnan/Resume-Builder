@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <style>
+    .icon { stroke: #000000; fill: transparent; }
+    @media (prefers-color-scheme: dark) {
+      .icon { stroke: #ffffff; }
+    }
+  </style>
+  <!-- Outer Square Border -->
+  <rect class="icon" x="2" y="2" width="36" height="36" stroke-width="3" />
+  
+  <!-- File Signature Lucide Icon Centered -->
+  <g class="icon" transform="translate(8, 8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 19.5v.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8.5L18 5.5"/>
+    <path d="M15 2v5h5"/>
+    <path d="M8 18h1"/>
+    <path d="M18.42 9.61a2.1 2.1 0 1 1 2.97 2.97L16.95 17 13 18l.99-3.95 4.43-4.44Z"/>
+  </g>
+</svg>
