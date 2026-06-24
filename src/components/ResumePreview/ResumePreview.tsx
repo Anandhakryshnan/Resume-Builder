@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useResume } from '../../context/ResumeContext';
 import { Mail, Phone, MapPin, Globe, ExternalLink, Settings2, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -616,87 +617,100 @@ export const ResumePreview = () => {
             <Settings2 size={16} /> Layout
           </button>
           
-          {isSettingsOpen && (
-            <div className="absolute right-0 top-full mt-3 w-72 bg-[var(--app-bg-color)] p-5 rounded-2xl shadow-2xl z-50 border border-[var(--glass-border)]">
-              <div className="flex justify-between items-center mb-5">
-                <h3 className="text-sm font-black uppercase tracking-widest text-[var(--app-text)] flex items-center gap-2"><Settings2 size={16}/> Settings</h3>
-                <button onClick={() => setIsSettingsOpen(false)} className="text-[var(--app-text-muted)] hover:text-[var(--app-text)] transition-colors"><X size={18}/></button>
-              </div>
-              <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[var(--app-text-muted)] scrollbar-track-transparent">
-                <div>
-                  <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
-                    <span className="text-[var(--app-text-muted)]">Page Margin</span>
-                    <span className="text-[var(--app-text)]">{layoutMargin}mm</span>
-                  </div>
-                  <input type="range" min="10" max="30" step="1" value={layoutMargin} onChange={(e) => setLayoutMargin(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
-                    <span className="text-[var(--app-text-muted)]">Base Font Size</span>
-                    <span className="text-[var(--app-text)]">{layoutFontSize}px</span>
-                  </div>
-                  <input type="range" min="11" max="18" step="1" value={layoutFontSize} onChange={(e) => setLayoutFontSize(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
-                    <span className="text-[var(--app-text-muted)]">Line Height</span>
-                    <span className="text-[var(--app-text)]">{layoutLineHeight}x</span>
-                  </div>
-                  <input type="range" min="1.1" max="2.0" step="0.05" value={layoutLineHeight} onChange={(e) => setLayoutLineHeight(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
-                    <span className="text-[var(--app-text-muted)]">Section Spacing</span>
-                    <span className="text-[var(--app-text)]">{sectionSpacing}x</span>
-                  </div>
-                  <input type="range" min="0.5" max="3.0" step="0.1" value={sectionSpacing} onChange={(e) => setSectionSpacing(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
+          {isSettingsOpen && typeof document !== 'undefined' && createPortal(
+            <div className="fixed inset-0 z-[100] flex flex-col justify-end md:justify-center items-center pointer-events-none">
+              {/* Overlay */}
+              <div 
+                className="absolute inset-0 bg-black/50 md:bg-black/40 backdrop-blur-sm transition-opacity pointer-events-auto" 
+                onClick={() => setIsSettingsOpen(false)}
+              ></div>
+              
+              {/* Settings Panel */}
+              <div className="relative w-full md:w-[420px] bg-[var(--app-bg-color)] p-5 md:p-6 rounded-t-3xl md:rounded-2xl shadow-[0_-20px_50px_rgba(0,0,0,0.5)] md:shadow-2xl border-t md:border border-[var(--glass-border)] max-h-[85vh] flex flex-col pointer-events-auto">
+                <div className="w-12 h-1.5 bg-gray-300/30 rounded-full mx-auto mb-4 md:hidden"></div>
+                
+                <div className="flex justify-between items-center mb-5 shrink-0">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-[var(--app-text)] flex items-center gap-2"><Settings2 size={16}/> Settings</h3>
+                  <button onClick={() => setIsSettingsOpen(false)} className="text-[var(--app-text-muted)] hover:text-[var(--app-text)] transition-colors p-1.5 bg-[var(--input-bg)] rounded-full hover:bg-[var(--btn-hover-bg)]"><X size={18}/></button>
                 </div>
                 
-                <div className="pt-2 border-t border-[var(--glass-border)]">
-                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider text-[var(--app-text-muted)]">Header Alignment</label>
-                  <div className="flex gap-2">
-                    {['left', 'center', 'right'].map((align) => (
-                      <button 
-                        key={align}
-                        onClick={() => setHeaderAlignment(align as any)}
-                        className={`flex-1 py-1.5 text-xs font-semibold capitalize rounded-md border ${headerAlignment === align ? 'bg-[var(--app-text)] text-[var(--app-bg-color)] border-[var(--app-text)]' : 'bg-transparent text-[var(--app-text)] border-[var(--input-border)] hover:bg-[var(--btn-hover-bg)]'}`}
-                      >
-                        {align}
-                      </button>
-                    ))}
+                <div className="space-y-6 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[var(--app-text-muted)] scrollbar-track-transparent pb-8 md:pb-2">
+                  <div>
+                    <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
+                      <span className="text-[var(--app-text-muted)]">Page Margin</span>
+                      <span className="text-[var(--app-text)]">{layoutMargin}mm</span>
+                    </div>
+                    <input type="range" min="10" max="30" step="1" value={layoutMargin} onChange={(e) => setLayoutMargin(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
                   </div>
-                </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
+                      <span className="text-[var(--app-text-muted)]">Base Font Size</span>
+                      <span className="text-[var(--app-text)]">{layoutFontSize}px</span>
+                    </div>
+                    <input type="range" min="11" max="18" step="1" value={layoutFontSize} onChange={(e) => setLayoutFontSize(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
+                      <span className="text-[var(--app-text-muted)]">Line Height</span>
+                      <span className="text-[var(--app-text)]">{layoutLineHeight}x</span>
+                    </div>
+                    <input type="range" min="1.1" max="2.0" step="0.05" value={layoutLineHeight} onChange={(e) => setLayoutLineHeight(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-wider">
+                      <span className="text-[var(--app-text-muted)]">Section Spacing</span>
+                      <span className="text-[var(--app-text)]">{sectionSpacing}x</span>
+                    </div>
+                    <input type="range" min="0.5" max="3.0" step="0.1" value={sectionSpacing} onChange={(e) => setSectionSpacing(Number(e.target.value))} className="w-full h-1.5 bg-[var(--input-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)]" />
+                  </div>
+                  
+                  <div className="pt-4 border-t border-[var(--glass-border)]">
+                    <label className="block text-xs font-bold mb-3 uppercase tracking-wider text-[var(--app-text-muted)]">Header Alignment</label>
+                    <div className="flex gap-2">
+                      {['left', 'center', 'right'].map((align) => (
+                        <button 
+                          key={align}
+                          onClick={() => setHeaderAlignment(align as any)}
+                          className={`flex-1 py-2 text-xs font-bold capitalize rounded-lg border transition-all ${headerAlignment === align ? 'bg-[var(--app-text)] text-[var(--app-bg-color)] border-[var(--app-text)] shadow-md' : 'bg-transparent text-[var(--app-text)] border-[var(--input-border)] hover:bg-[var(--btn-hover-bg)]'}`}
+                        >
+                          {align}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider text-[var(--app-text-muted)]">Bullet Style</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['disc', 'circle', 'square', 'none'].map((style) => (
-                      <button 
-                        key={style}
-                        onClick={() => setBulletStyle(style as any)}
-                        className={`py-1.5 text-xs font-semibold capitalize rounded-md border ${bulletStyle === style ? 'bg-[var(--app-text)] text-[var(--app-bg-color)] border-[var(--app-text)]' : 'bg-transparent text-[var(--app-text)] border-[var(--input-border)] hover:bg-[var(--btn-hover-bg)]'}`}
-                      >
-                        {style}
-                      </button>
-                    ))}
+                  <div>
+                    <label className="block text-xs font-bold mb-3 uppercase tracking-wider text-[var(--app-text-muted)]">Bullet Style</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {['disc', 'circle', 'square', 'none'].map((style) => (
+                        <button 
+                          key={style}
+                          onClick={() => setBulletStyle(style as any)}
+                          className={`py-2 text-xs font-bold capitalize rounded-lg border transition-all ${bulletStyle === style ? 'bg-[var(--app-text)] text-[var(--app-bg-color)] border-[var(--app-text)] shadow-md' : 'bg-transparent text-[var(--app-text)] border-[var(--input-border)] hover:bg-[var(--btn-hover-bg)]'}`}
+                        >
+                          {style}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="pt-2 border-t border-[var(--glass-border)]">
-                  <div className="flex justify-between items-center text-xs font-bold mb-2 uppercase tracking-wider text-[var(--app-text-muted)]">
-                    <span>Heading Color</span>
-                    <div className="relative w-6 h-6 rounded-none overflow-hidden border border-[var(--input-border)] cursor-pointer">
-                      <input 
-                        type="color" 
-                        value={headingColor.hex}
-                        onChange={(e) => setHeadingColor({ name: 'Custom', hex: e.target.value })}
-                        className="absolute -top-2 -left-2 w-10 h-10 cursor-pointer"
-                      />
+                  
+                  <div className="pt-4 border-t border-[var(--glass-border)] pb-2">
+                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-[var(--app-text-muted)]">
+                      <span>Heading Color</span>
+                      <div className="relative w-8 h-8 rounded-lg overflow-hidden border-2 border-[var(--input-border)] cursor-pointer hover:border-[var(--app-text)] transition-colors shadow-sm">
+                        <input 
+                          type="color" 
+                          value={headingColor.hex}
+                          onChange={(e) => setHeadingColor({ name: 'Custom', hex: e.target.value })}
+                          className="absolute -top-2 -left-2 w-12 h-12 cursor-pointer"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
       </div>
